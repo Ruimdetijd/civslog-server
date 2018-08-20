@@ -1,9 +1,10 @@
 {
   "name": "civslog-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Civ's Log server",
   "repository": "https://github.com/ruimdetijd/civslog-server.git",
   "scripts": {
+    "prestart": "npm install",
     "start": "node build/index.js",
     "start:dev": "nodemon build/index.js",
     "watch": "tsc -w"
