@@ -13,12 +13,12 @@
   "devDependencies": {
     "@types/express": "^4.16.0",
     "@types/pg": "^7.4.10",
-    "typescript": "2.9.2"
+    "typescript": "3.0.1"
   },
   "dependencies": {
     "chalk": "^2.4.1",
     "express": "^4.16.3",
-    "node-fetch": "^2.1.2",
+    "node-fetch": "^2.2.0",
     "pg": "^7.4.3",
     "timeline": "^3.1.1"
   }
