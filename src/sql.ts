@@ -39,5 +39,7 @@ export const selectEventsSql = (props: Props) => {
 
 	const limit = props.limit == null ? '' : ` LIMIT ${props.limit}`
 
-	return part1 + where + part2 + limit
+	const sql = part1 + where + part2 + limit
+
+	return sql
 }

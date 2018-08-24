@@ -26,7 +26,8 @@ app.post('/events/:wikidataID/tags', async (req, res) => {
 
 app.get('/events/:wikidataID', async (req, res) => {
 	const event = await selectOne('event', 'wikidata_identifier', req.params.wikidataID)
-	res.json(event)
+	if (event == null) res.status(404).end()
+	else res.json(event)
 })
 
 app.delete('/events/:wikidataID', async (req, res) => {
@@ -78,7 +79,8 @@ app.get('/events/by-tag/:tag', async (req, res) => {
 		where: 'event__tag.tag_id = tag.id AND event__tag.event_id = event.id AND tag.label = $1'
 	}
 	const result = await execSql(selectEventsSql(config), [req.params.tag])
-	const events = result.rows.filter(e => !(e.date_min == null && e.date == null && e.end_date == null && e.end_date_max == null))
+
+	const events = result.rows
 
 	const from = events[0].date_min || events[0].date
 	const to = events.reduce((prev, curr) => {

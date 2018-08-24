@@ -29,5 +29,6 @@ exports.selectEventsSql = (props) => {
 				WHEN event.end_date_max IS NOT NULL THEN event.end_date_max
 			END`;
     const limit = props.limit == null ? '' : ` LIMIT ${props.limit}`;
-    return part1 + where + part2 + limit;
+    const sql = part1 + where + part2 + limit;
+    return sql;
 };

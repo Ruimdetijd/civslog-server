@@ -32,7 +32,10 @@ app.post('/events/:wikidataID/tags', (req, res) => __awaiter(this, void 0, void 
 }));
 app.get('/events/:wikidataID', (req, res) => __awaiter(this, void 0, void 0, function* () {
     const event = yield utils_1.selectOne('event', 'wikidata_identifier', req.params.wikidataID);
-    res.json(event);
+    if (event == null)
+        res.status(404).end();
+    else
+        res.json(event);
 }));
 app.delete('/events/:wikidataID', (req, res) => __awaiter(this, void 0, void 0, function* () {
     const code = yield delete_event_1.default(req.params.wikidataID);
@@ -75,7 +78,7 @@ app.get('/events/by-tag/:tag', (req, res) => __awaiter(this, void 0, void 0, fun
         where: 'event__tag.tag_id = tag.id AND event__tag.event_id = event.id AND tag.label = $1'
     };
     const result = yield utils_1.execSql(sql_1.selectEventsSql(config), [req.params.tag]);
-    const events = result.rows.filter(e => !(e.date_min == null && e.date == null && e.end_date == null && e.end_date_max == null));
+    const events = result.rows;
     const from = events[0].date_min || events[0].date;
     const to = events.reduce((prev, curr) => {
         return Math.max(prev, curr.end_date || -Infinity, curr.end_date_max || -Infinity);
