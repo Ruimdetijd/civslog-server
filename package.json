@@ -1,13 +1,13 @@
 {
   "name": "civslog-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Civ's Log server",
   "repository": "https://github.com/ruimdetijd/civslog-server.git",
   "scripts": {
     "build": "rm -rf build && tsc",
     "release": "./release.sh",
-    "start": "node build/index.js",
-    "start:dev": "nodemon build/index.js",
+    "start": "npm i && npm run build && node build/index.js",
+    "start:dev": "npm i && npm run build && nodemon build/index.js",
     "watch": "tsc -w"
   },
   "author": "Gijsjan Brouwer",
