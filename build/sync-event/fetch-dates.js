@@ -1,25 +1,35 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const chalk_1 = require("chalk");
+const tslib_1 = require("tslib");
 const models_1 = require("../models");
 const fetch_claim_value_1 = require("../wikidata/fetch-claim-value");
 const utils_1 = require("../utils");
-const onDate = (a, b) => {
+function onDate(a, b) {
     if (a.timestamp > b.timestamp)
         return 1;
     if (a.timestamp < b.timestamp)
         return -1;
     return 0;
-};
-exports.default = (wdEntityID) => __awaiter(this, void 0, void 0, function* () {
+}
+function toEndDate(wdDate) {
+    const date = new Date(wdDate.timestamp);
+    let nextDate;
+    if (wdDate.granularity === 'DAY')
+        nextDate = utils_1.setUTCDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999);
+    else if (wdDate.granularity === 'MONTH')
+        nextDate = utils_1.setUTCDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999);
+    else if (wdDate.granularity === 'YEAR')
+        nextDate = utils_1.setUTCDate(date.getUTCFullYear(), 11, 31, 23, 59, 59, 999);
+    else {
+        utils_1.logError('fetchDates', [`Unhandled granularity "${wdDate.granularity}"`]);
+    }
+    if (nextDate != null) {
+        wdDate.timestamp = nextDate;
+    }
+    console.log(wdDate);
+    return wdDate;
+}
+exports.default = (wdEntityID) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     const dates = [new models_1.WdDate(), new models_1.WdDate(), new models_1.WdDate(), new models_1.WdDate()];
     const startProps = ['start time', 'date of birth'];
     const startPropsPromises = startProps.map(sp => fetch_claim_value_1.default(wdEntityID, sp));
@@ -27,23 +37,7 @@ exports.default = (wdEntityID) => __awaiter(this, void 0, void 0, function* () {
     const endProps = ['end time', 'date of death'];
     const endPropsPromises = endProps.map(sp => fetch_claim_value_1.default(wdEntityID, sp));
     let endDates = yield utils_1.promiseAll(endPropsPromises);
-    endDates = endDates.map(dd => {
-        const date = new Date(dd.timestamp);
-        let nextDate;
-        if (dd.granularity === 'DAY')
-            nextDate = utils_1.setUTCDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999);
-        else if (dd.granularity === 'MONTH')
-            nextDate = utils_1.setUTCDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999);
-        else if (dd.granularity === 'YEAR')
-            nextDate = utils_1.setUTCDate(date.getUTCFullYear(), 11, 31, 23, 59, 59, 999);
-        else {
-            console.error(chalk_1.default `{red Unhandled granularity "${dd.granularity}"}`);
-        }
-        if (nextDate != null) {
-            dd.timestamp = nextDate;
-        }
-        return dd;
-    });
+    endDates = endDates.map(toEndDate);
     let pointsInTime = yield fetch_claim_value_1.default(wdEntityID, 'point in time');
     pointsInTime.sort(onDate);
     if (pointsInTime.length) {
@@ -56,7 +50,8 @@ exports.default = (wdEntityID) => __awaiter(this, void 0, void 0, function* () {
                 return dates;
             }
             dates[0] = pointsInTime[0];
-            dates[3] = pointsInTime[pointsInTime.length - 1];
+            const endDateMax = pointsInTime[pointsInTime.length - 1];
+            dates[3] = toEndDate(endDateMax);
             return dates;
         }
     }

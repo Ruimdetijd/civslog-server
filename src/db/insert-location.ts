@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { execSql } from './utils'
+import { execSql, hasRows } from './utils'
 import { Ev3nt, WdLocation } from '../models'
 
 export default async (event: Ev3nt, location: WdLocation): Promise<WdLocation> => {
@@ -18,7 +18,7 @@ export default async (event: Ev3nt, location: WdLocation): Promise<WdLocation> =
 
 	const result = await execSql(sql, [location.label, location.description, location.wikidata_identifier])
 
-	if (result.rows.length) {
+	if (hasRows(result)) {
 		console.log(chalk`\n{green [DB] Inserted location:}
 {gray label}\t\t\t${location.label}
 {gray description}\t\t${location.description}

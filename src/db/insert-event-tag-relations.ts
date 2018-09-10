@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { execSql } from './utils';
+import { execSql, hasRows } from './utils';
 import { HttpCode } from '../constants';
 
 export default async function insertEventTagRelations(eventId, tagIds): Promise<HttpCode> {
@@ -11,7 +11,7 @@ export default async function insertEventTagRelations(eventId, tagIds): Promise<
 									${tagIds.map(id => `(${eventId}, ${id})`)}
 								ON CONFLICT DO NOTHING`)
 
-	if (result.rows.length) console.log(chalk`{green ${result.rows.length.toString()} tag(s) inserted/updated in db!}`)
+	if (hasRows(result)) console.log(chalk`{green ${result.rows.length.toString()} tag(s) inserted/updated in db!}`)
 
 	return HttpCode.NoContent
 }

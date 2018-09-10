@@ -1,3 +1,4 @@
+import { performance } from 'perf_hooks'
 import * as express from 'express'
 import { calcPixelsPerMillisecond, orderEvents } from 'timeline'
 import { selectEventsSql } from './sql';
@@ -6,6 +7,8 @@ import { execSql, selectOne, byMissing } from './db/utils'
 import insertTag from './db/insert-tag'
 import deleteEvent from './db/delete-event';
 import insertEventTagRelations from './db/insert-event-tag-relations';
+import { HttpCode } from './constants';
+import fetchImage from './wikidata/fetch-image';
 
 const app = express()
 app.disable('x-powered-by')
@@ -13,6 +16,10 @@ app.use(express.json())
 
 app.post('/events/:wikidataID', async (req, res) => {
 	const event = await syncEvent(req.params.wikidataID)
+	if (event == null) {
+		res.status(HttpCode.NotFound).end()
+		return
+	}
 	const fullEvent = await selectOne('event', 'id', event.id)
 	res.json(fullEvent)
 })
@@ -26,8 +33,16 @@ app.post('/events/:wikidataID/tags', async (req, res) => {
 
 app.get('/events/:wikidataID', async (req, res) => {
 	const event = await selectOne('event', 'wikidata_identifier', req.params.wikidataID)
-	if (event == null) res.status(404).end()
+	if (event == null) res.status(HttpCode.NotFound).end()
 	else res.json(event)
+})
+
+const missingImageWhere = "event.has_image IS NULL OR event.has_image = 'none'"
+app.get('/events/by-missing/image', byMissing(missingImageWhere))
+
+app.get('/events/:wikidataID/image', async (req, res) => {
+	const code = await fetchImage({ id: req.params.wikidataID })
+	res.status(code).end()
 })
 
 app.delete('/events/:wikidataID', async (req, res) => {
@@ -59,7 +74,7 @@ app.get('/events/by-missing/date', byMissing(missingDateWhere))
 const missingLocationWhere = `NOT EXISTS (SELECT * FROM event__location WHERE event__location.event_id = event.id)`
 app.get('/events/by-missing/location', byMissing(missingLocationWhere))
 
-const missingEverythingWhere = `${missingLocationWhere} AND ${missingLabelWhere} ${missingDateWhere.slice("event.label IS NOT NULL".length)}`
+const missingEverythingWhere = `${missingLocationWhere} AND ${missingImageWhere} ${missingDateWhere.slice("event.label IS NOT NULL".length)}`
 app.get('/events/by-missing/everything', byMissing(missingEverythingWhere))
 app.delete('/events/by-missing/everything', async (req, res) => {
 	const config = { where: missingEverythingWhere }
@@ -88,7 +103,11 @@ app.get('/events/by-tag/:tag', async (req, res) => {
 	}, -Infinity)
 
 	const pixelsPerMillisecond = calcPixelsPerMillisecond(viewportWidth, zoomLevel, to - from)
-	res.json(orderEvents(events, pixelsPerMillisecond))
+
+	const t0 = performance.now()
+	const json = orderEvents(events, pixelsPerMillisecond)
+	const t1 = performance.now(); console.log('Performance order events: ', `${t1 - t0}ms`)
+	res.json(json)
 })
 
 const PORT = 3377

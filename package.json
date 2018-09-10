@@ -2,25 +2,35 @@
   "name": "civslog-server",
   "version": "1.0.3",
   "description": "Civ's Log server",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "repository": "https://github.com/ruimdetijd/civslog-server.git",
   "scripts": {
     "build": "rm -rf build && tsc",
     "release": "./release.sh",
-    "start": "npm i && npm run build && node build/index.js",
-    "start:dev": "npm i && npm run build && nodemon build/index.js",
+    "start": "npm run build && node build/index.js",
+    "start:dev": "npm run build && nodemon build/index.js",
     "watch": "tsc -w"
   },
   "author": "Gijsjan Brouwer",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@types/express": "^4.16.0",
+    "@types/file-type": "^5.2.1",
+    "@types/is-svg": "^3.0.0",
+    "@types/jimp": "^0.2.28",
+    "@types/node-fetch": "^2.1.2",
     "@types/pg": "^7.4.10",
     "nodemon": "^1.18.3",
+    "tslib": "^1.9.3",
     "typescript": "3.0.1"
   },
   "dependencies": {
     "chalk": "^2.4.1",
     "express": "^4.16.3",
+    "file-type": "^9.0.0",
+    "is-svg": "^3.0.0",
+    "jimp": "^0.3.8",
     "node-fetch": "^2.2.0",
     "pg": "^7.4.3",
     "timeline": "^3.1.1"

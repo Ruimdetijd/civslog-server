@@ -1,16 +1,9 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const chalk_1 = require("chalk");
 const utils_1 = require("./utils");
-exports.default = (event, location) => __awaiter(this, void 0, void 0, function* () {
+exports.default = (event, location) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     if (location.coordinates == null)
         return;
     const sql = `INSERT INTO location
@@ -24,7 +17,7 @@ exports.default = (event, location) => __awaiter(this, void 0, void 0, function*
 					wikidata_identifier = $3
 				RETURNING *`;
     const result = yield utils_1.execSql(sql, [location.label, location.description, location.wikidata_identifier]);
-    if (result.rows.length) {
+    if (utils_1.hasRows(result)) {
         console.log(chalk_1.default `\n{green [DB] Inserted location:}
 {gray label}\t\t\t${location.label}
 {gray description}\t\t${location.description}

@@ -11,10 +11,39 @@ exports.WdDate = WdDate;
 class WdEntity {
     constructor(entity) {
         this.id = entity.id;
-        if (entity.hasOwnProperty('labels') && entity.labels.hasOwnProperty('en') && entity.labels.en.hasOwnProperty('value'))
-            this.label = entity.labels.en.value;
-        if (entity.hasOwnProperty('descriptions') && entity.descriptions.hasOwnProperty('en') && entity.descriptions.en.hasOwnProperty('value'))
-            this.description = entity.descriptions.en.value;
+        this.label = this.getProp(entity.labels);
+        this.description = this.getProp(entity.descriptions);
+    }
+    getProp(prop) {
+        if (prop == null)
+            return;
+        function test(lang) {
+            return prop.hasOwnProperty(lang) && prop[lang].hasOwnProperty('value');
+        }
+        if (test('en'))
+            return prop.en.value;
+        if (test('de'))
+            return prop.de.value;
+        if (test('fr'))
+            return prop.fr.value;
+        if (test('nl'))
+            return prop.nl.value;
+        if (test('ru'))
+            return prop.ru.value;
+        if (test('es'))
+            return prop.es.value;
+        if (test('ca'))
+            return prop.ca.value;
+        if (test('it'))
+            return prop.it.value;
+        if (test('pl'))
+            return prop.pl.value;
+        if (test('pt'))
+            return prop.pt.value;
+        if (test('ceb'))
+            return prop.ceb.value;
+        if (test('sv'))
+            return prop.sv.value;
     }
 }
 exports.WdEntity = WdEntity;

@@ -1,17 +1,15 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const pool_1 = require("./pool");
 const utils_1 = require("../utils");
 const sql_1 = require("../sql");
-exports.byMissing = (where) => (req, res) => __awaiter(this, void 0, void 0, function* () {
+function hasRows(result) {
+    return (result != null && result.hasOwnProperty('rows') && result.rows.length);
+}
+exports.hasRows = hasRows;
+exports.byMissing = (where) => (req, res) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    where = `(${where}) AND (event.updated IS NULL OR event.updated < NOW() - INTERVAL '7 days')`;
     const { limit } = req.query;
     const config = { limit, where };
     let eventsResult = yield exports.execSql(sql_1.selectEventsSql(config));
@@ -19,14 +17,14 @@ exports.byMissing = (where) => (req, res) => __awaiter(this, void 0, void 0, fun
     const count = countResult.rows[0].count;
     res.json({ events: eventsResult.rows, count });
 });
-exports.selectOne = (table, field, value) => __awaiter(this, void 0, void 0, function* () {
+exports.selectOne = (table, field, value) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     const sql = `SELECT *
 				FROM ${table}
 				WHERE ${field}=$1`;
     const result = yield exports.execSql(sql, [value]);
     return result.rows[0];
 });
-exports.execSql = (sql, values = []) => __awaiter(this, void 0, void 0, function* () {
+exports.execSql = (sql, values = []) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     let result;
     const pool = pool_1.default();
     try {

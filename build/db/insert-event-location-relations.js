@@ -1,15 +1,8 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 const utils_1 = require("./utils");
-exports.default = (event, startLocations, endLocations = []) => __awaiter(this, void 0, void 0, function* () {
+exports.default = (event, startLocations, endLocations = []) => tslib_1.__awaiter(this, void 0, void 0, function* () {
     startLocations = startLocations
         .filter(sl => sl != null)
         .map(bl => {
@@ -40,6 +33,7 @@ exports.default = (event, startLocations, endLocations = []) => __awaiter(this, 
 					${locations.map(location => `(${event.id}, ${location.id}, ${location.date}, ${location.end_date})`)}
 				ON CONFLICT DO NOTHING`;
     const result = yield utils_1.execSql(sql);
-    if (result.rows.length)
+    if (utils_1.hasRows(result)) {
         console.log(`${result.rows.length} location(s) inserted/updated in db!`);
+    }
 });

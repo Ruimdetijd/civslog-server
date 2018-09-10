@@ -1,5 +1,5 @@
 import { WdLocation, Ev3nt } from '../models'
-import { execSql } from './utils';
+import { execSql, hasRows } from './utils';
 
 export default async (event: Ev3nt, startLocations: WdLocation[], endLocations: WdLocation[] = []) => {
 	// console.log(event, startLocations, endLocations)
@@ -39,5 +39,7 @@ export default async (event: Ev3nt, startLocations: WdLocation[], endLocations: 
 
 	const result = await execSql(sql)
 
-	if (result.rows.length) console.log(`${result.rows.length} location(s) inserted/updated in db!`)
+	if (hasRows(result)) {
+		console.log(`${result.rows.length} location(s) inserted/updated in db!`)
+	} 
 }

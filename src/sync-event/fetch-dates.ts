@@ -1,12 +1,30 @@
-import chalk from "chalk"
 import { WdDate } from "../models"
 import fetchClaimValue from "../wikidata/fetch-claim-value"
 import { setUTCDate, promiseAll, logError } from "../utils"
 
-const onDate = (a, b) => {
+function onDate(a: WdDate, b: WdDate): -1 | 0 | 1 {
 	if (a.timestamp > b.timestamp) return 1
 	if (a.timestamp < b.timestamp) return -1
 	return 0
+}
+
+function toEndDate(wdDate: WdDate): WdDate {
+	const date = new Date(wdDate.timestamp)
+	let nextDate
+
+	if (wdDate.granularity === 'DAY') nextDate = setUTCDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999)
+	else if (wdDate.granularity === 'MONTH') nextDate = setUTCDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999)
+	else if (wdDate.granularity === 'YEAR') nextDate = setUTCDate(date.getUTCFullYear(), 11, 31, 23, 59, 59, 999)
+	else {
+		logError('fetchDates', [`Unhandled granularity "${wdDate.granularity}"`])
+	}
+
+	if (nextDate != null) {
+		wdDate.timestamp = nextDate
+	}
+
+	console.log(wdDate)
+	return wdDate
 }
 
 type DateRange = [WdDate, WdDate, WdDate, WdDate]
@@ -23,25 +41,9 @@ export default async (wdEntityID: string): Promise<DateRange> => {
 	const endProps = ['end time', 'date of death']
 	const endPropsPromises = endProps.map(sp => fetchClaimValue(wdEntityID, sp))
 	let endDates: WdDate[] = await promiseAll(endPropsPromises)
-	endDates = endDates.map(dd => {
-		const date = new Date(dd.timestamp)
-		let nextDate
+	endDates = endDates.map(toEndDate)
 
-		if (dd.granularity === 'DAY') nextDate = setUTCDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999)
-		else if (dd.granularity === 'MONTH') nextDate = setUTCDate(date.getUTCFullYear(), date.getUTCMonth() + 1, 0, 23, 59, 59, 999)
-		else if (dd.granularity === 'YEAR') nextDate = setUTCDate(date.getUTCFullYear(), 11, 31, 23, 59, 59, 999)
-		else {
-			console.error(chalk`{red Unhandled granularity "${dd.granularity}"}`)
-		}
-
-		if (nextDate != null) {
-			dd.timestamp = nextDate
-		}
-
-		return dd
-	})
-
-	let pointsInTime = await fetchClaimValue(wdEntityID, 'point in time')
+	let pointsInTime: WdDate[] = await fetchClaimValue(wdEntityID, 'point in time')
 	pointsInTime.sort(onDate)
 	if (pointsInTime.length) {
 		if (pointsInTime.length === 1) {
@@ -54,7 +56,8 @@ export default async (wdEntityID: string): Promise<DateRange> => {
 			}
 
 			dates[0] = pointsInTime[0]
-			dates[3] = pointsInTime[pointsInTime.length - 1]
+			const endDateMax = pointsInTime[pointsInTime.length - 1]
+			dates[3] = toEndDate(endDateMax)
 			return dates
 		}
 	}

@@ -13,8 +13,29 @@ export class WdEntity {
 
 	constructor(entity) {
 		this.id = entity.id	
-		if (entity.hasOwnProperty('labels') && entity.labels.hasOwnProperty('en') && entity.labels.en.hasOwnProperty('value')) this.label = entity.labels.en.value
-		if (entity.hasOwnProperty('descriptions') && entity.descriptions.hasOwnProperty('en') && entity.descriptions.en.hasOwnProperty('value'))	this.description = entity.descriptions.en.value
+		this.label = this.getProp(entity.labels)
+		this.description = this.getProp(entity.descriptions)
+	}
+
+	private getProp(prop: any): string {
+		if (prop == null) return
+
+		function test(lang) {
+			return prop.hasOwnProperty(lang) && prop[lang].hasOwnProperty('value')
+		} 
+
+		if (test('en')) return prop.en.value // English
+		if (test('de')) return prop.de.value // German
+		if (test('fr')) return prop.fr.value // French
+		if (test('nl')) return prop.nl.value // Dutch
+		if (test('ru')) return prop.ru.value // Russian
+		if (test('es')) return prop.es.value // Spanish
+		if (test('ca')) return prop.ca.value // Catalan
+		if (test('it')) return prop.it.value // Italian
+		if (test('pl')) return prop.pl.value // Polish
+		if (test('pt')) return prop.pt.value // Portugese
+		if (test('ceb')) return prop.ceb.value // Cebuano
+		if (test('sv')) return prop.sv.value // Swedish
 	}
 }
 

@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "jsx": "react",
+    "declaration": true,
     "module": "commonjs",
+    "importHelpers": true,
     "noUnusedLocals": true,
     "outDir": "build",
     "removeComments": true,

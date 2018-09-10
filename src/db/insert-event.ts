@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import { WdDate, Ev3nt, WdEntity } from '../models'
-import { execSql } from './utils';
+import { execSql, hasRows } from './utils';
 import { logWarning } from '../utils';
 
 export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
@@ -12,9 +12,9 @@ export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
 	const [dateMin, date, endDate, endDateMax] = dates
 
 	const sql = `INSERT INTO event
-					(label, description, date_min, date, end_date, end_date_max, date_min_granularity, date_granularity, end_date_granularity, end_date_max_granularity, wikidata_identifier)
+					(label, description, date_min, date, end_date, end_date_max, date_min_granularity, date_granularity, end_date_granularity, end_date_max_granularity, wikidata_identifier, updated)
 				VALUES
-					($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+					($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
 				ON CONFLICT (wikidata_identifier)
 				DO UPDATE SET
 					label = $1,
@@ -26,7 +26,8 @@ export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
 					date_min_granularity = $7,
 					date_granularity = $8,
 					end_date_granularity = $9,
-					end_date_max_granularity = $10
+					end_date_max_granularity = $10,
+					updated = NOW()
 				RETURNING *`
 
 	const result = await execSql(sql, [
@@ -43,7 +44,7 @@ export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
 		entity.id
 	])
 
-	if (result.rows.length) {
+	if (hasRows(result)) {
 		console.log(chalk`\n{green [DB] Inserted event:}
 {gray label}\t\t\t\t${entity.label}
 {gray description}\t\t\t${entity.description}
@@ -60,6 +61,7 @@ export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
 
 		event = result.rows[0]
 	}
+
 
 	return event
 }

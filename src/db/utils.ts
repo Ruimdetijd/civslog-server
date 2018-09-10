@@ -3,7 +3,12 @@ import { logError } from '../utils'
 import { selectEventsSql } from '../sql';
 import { QueryResult } from 'pg';
 
+export function hasRows(result: QueryResult) {
+	return (result != null && result.hasOwnProperty('rows') && result.rows.length)
+}
+
 export const byMissing = (where) => async (req, res) => {
+	where = `(${where}) AND (event.updated IS NULL OR event.updated < NOW() - INTERVAL '7 days')`
 	const { limit } = req.query
 	const config = { limit, where }
 	let eventsResult = await execSql(selectEventsSql(config))
