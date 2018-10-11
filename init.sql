@@ -48,10 +48,9 @@ CREATE TYPE classtype AS ENUM (
 
 CREATE TABLE event (
 	id SERIAL PRIMARY KEY,
-	old_id BIGINT,
 	wid TEXT UNIQUE, -- wikidata ID
 	lbl TEXT, -- label
-	descr TEXT, -- description
+	dsc TEXT, -- description
 	class classtype [],
 	dmin TIMESTAMP WITH TIME ZONE, -- date min
 	dmin_g granularity,
@@ -65,12 +64,22 @@ CREATE TABLE event (
 	upd TIMESTAMP WITH TIME ZONE -- updated
 );
 
+CREATE INDEX battle_event_index ON event(class) WHERE class @> '{battle}';
+CREATE INDEX war_event_index ON event(class) WHERE class @> '{war}';
+CREATE INDEX human_event_index ON event(class) WHERE class @> '{human}';
+CREATE INDEX male_event_index ON event(class) WHERE class @> '{male}';
+CREATE INDEX female_event_index ON event(class) WHERE class @> '{female}';
+CREATE INDEX explorer_event_index ON event(class) WHERE class @> '{explorer}';
+CREATE INDEX naval_battle_event_index ON event(class) WHERE class @> '{naval battle}';
+CREATE INDEX aerial_battle_event_index ON event(class) WHERE class @> '{aerial battle}';
+CREATE INDEX military_campaign_event_index ON event(class) WHERE class @> '{military campaign}';
+CREATE INDEX military_operation_event_index ON event(class) WHERE class @> '{military operation}';
+
 CREATE TABLE location (
 	id SERIAL PRIMARY KEY,
-	old_id BIGINT,
 	wid TEXT UNIQUE, -- wikidate ID
 	lbl TEXT, -- label
-	descr TEXT, -- description
+	dsc TEXT, -- description
 	coor geometry(Point,3857),
 	coor4326 geography(Point,4326)
 );

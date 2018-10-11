@@ -1,10 +1,11 @@
 import chalk from 'chalk'
-import { WdDate, Ev3nt, WdEntity } from '../models'
+import { WdDate, WdEntity } from '../models'
 import { execSql, hasRows } from './utils';
 import { logWarning } from '../utils';
+import { RawEv3nt } from 'timeline';
 
-export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
-	let event: Ev3nt
+export default async (entity: WdEntity, dates: WdDate[]): Promise<RawEv3nt> => {
+	let event: RawEv3nt
 
 	if (dates.every(d => d.timestamp == null)) {
 		logWarning('insertEvent', [`Entity '${entity.label}' (${entity.id}) has no dates`])
@@ -12,31 +13,31 @@ export default async (entity: WdEntity, dates: WdDate[]): Promise<Ev3nt> => {
 	const [dateMin, date, endDate, endDateMax] = dates
 
 	const sql = `INSERT INTO event
-					(label, description, date_min, date, end_date, end_date_max, date_min_granularity, date_granularity, end_date_granularity, end_date_max_granularity, wikidata_identifier, updated)
+					(lbl, dsc, dmin, d, ed, dmax, dmin_g, d_g, ed_g, dmax_g, wid, upd)
 				VALUES
 					($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
-				ON CONFLICT (wikidata_identifier)
+				ON CONFLICT (wid)
 				DO UPDATE SET
-					label = $1,
-					description = $2,
-					date_min = $3,
-					date = $4,
-					end_date = $5,
-					end_date_max = $6,
-					date_min_granularity = $7,
-					date_granularity = $8,
-					end_date_granularity = $9,
-					end_date_max_granularity = $10,
-					updated = NOW()
+					lbl = $1,
+					dsc = $2,
+					dmin = $3,
+					d = $4,
+					ed = $5,
+					dmax = $6,
+					dmin_g = $7,
+					d_g = $8,
+					ed_g = $9,
+					dmax_g = $10,
+					upd = NOW()
 				RETURNING *`
 
 	const result = await execSql(sql, [
 		entity.label,
 		entity.description,
-		dateMin.timestamp,
-		date.timestamp,
-		endDate.timestamp,
-		endDateMax.timestamp,
+		dateMin.dateString,
+		date.dateString,
+		endDate.dateString,
+		endDateMax.dateString,
 		dateMin.granularity,
 		date.granularity,
 		endDate.granularity,

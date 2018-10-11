@@ -11,30 +11,30 @@ exports.default = (entity, dates) => tslib_1.__awaiter(this, void 0, void 0, fun
     }
     const [dateMin, date, endDate, endDateMax] = dates;
     const sql = `INSERT INTO event
-					(label, description, date_min, date, end_date, end_date_max, date_min_granularity, date_granularity, end_date_granularity, end_date_max_granularity, wikidata_identifier, updated)
+					(lbl, dsc, dmin, d, ed, dmax, dmin_g, d_g, ed_g, dmax_g, wid, upd)
 				VALUES
 					($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW())
-				ON CONFLICT (wikidata_identifier)
+				ON CONFLICT (wid)
 				DO UPDATE SET
-					label = $1,
-					description = $2,
-					date_min = $3,
-					date = $4,
-					end_date = $5,
-					end_date_max = $6,
-					date_min_granularity = $7,
-					date_granularity = $8,
-					end_date_granularity = $9,
-					end_date_max_granularity = $10,
-					updated = NOW()
+					lbl = $1,
+					dsc = $2,
+					dmin = $3,
+					d = $4,
+					ed = $5,
+					dmax = $6,
+					dmin_g = $7,
+					d_g = $8,
+					ed_g = $9,
+					dmax_g = $10,
+					upd = NOW()
 				RETURNING *`;
     const result = yield utils_1.execSql(sql, [
         entity.label,
         entity.description,
-        dateMin.timestamp,
-        date.timestamp,
-        endDate.timestamp,
-        endDateMax.timestamp,
+        dateMin.dateString,
+        date.dateString,
+        endDate.dateString,
+        endDateMax.dateString,
         dateMin.granularity,
         date.granularity,
         endDate.granularity,

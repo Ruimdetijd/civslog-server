@@ -66,8 +66,8 @@ export default async function fetchImage(options: Options): Promise<HttpCode> {
 
 		if (options.updateEvent) {
 			const sql = `UPDATE event
-						SET has_image = $1
-						WHERE wikidata_identifier = $2`
+						SET img = $1
+						WHERE wid = $2`
 			await execSql(sql, [ext, options.id])
 		}
 

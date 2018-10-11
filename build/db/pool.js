@@ -1,10 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs_1 = require("fs");
 const pg = require("pg");
 pg.types.setTypeParser(20, function (value) {
     return parseInt(value);
 });
-const fs_1 = require("fs");
+pg.types.setTypeParser(1184, function (value) {
+    return value;
+});
 function getSecret(name) {
     const path = `/run/secrets/${name}`;
     if (fs_1.existsSync(path)) {
@@ -12,7 +15,7 @@ function getSecret(name) {
     }
 }
 exports.default = () => new pg.Pool({
-    database: getSecret('civslog_db_name') || 'timeline',
+    database: getSecret('civslog_db_name') || 'timeline_new',
     host: process.env.PGHOST,
     password: getSecret('civslog_db_password') || 'postgis',
     user: getSecret('civslog_db_user') || 'postgres'

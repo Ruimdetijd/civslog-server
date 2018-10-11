@@ -61,8 +61,8 @@ function fetchImage(options) {
             }
             if (options.updateEvent) {
                 const sql = `UPDATE event
-						SET has_image = $1
-						WHERE wikidata_identifier = $2`;
+						SET img = $1
+						WHERE wid = $2`;
                 yield utils_2.execSql(sql, [ext, options.id]);
             }
             utils_1.logMessage(`Fetched image for ${chalk_1.default.magenta(options.id)} to ${chalk_1.default.magenta(options.outputPath)}`);

@@ -26,7 +26,6 @@ function toEndDate(wdDate) {
     if (nextDate != null) {
         wdDate.timestamp = nextDate;
     }
-    console.log(wdDate);
     return wdDate;
 }
 exports.default = (wdEntityID) => tslib_1.__awaiter(this, void 0, void 0, function* () {

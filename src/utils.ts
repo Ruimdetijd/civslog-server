@@ -26,7 +26,7 @@ export const execFetch = async (url: string, options = {}) => {
 		throwError(err)
 	}
 
-	console.log(body)
+	// console.log(body)
 
 	return body
 }

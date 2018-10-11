@@ -8,4 +8,5 @@ var HttpCode;
     HttpCode[HttpCode["NoContent"] = 204] = "NoContent";
     HttpCode[HttpCode["BadRequest"] = 400] = "BadRequest";
     HttpCode[HttpCode["NotFound"] = 404] = "NotFound";
+    HttpCode[HttpCode["InternalServerError"] = 500] = "InternalServerError";
 })(HttpCode = exports.HttpCode || (exports.HttpCode = {}));

@@ -24,6 +24,15 @@ const granularityByPrecision = {
     10: 'MONTH',
     11: 'DAY',
 };
+function toISOString(timestamp) {
+    if (timestamp == null)
+        return timestamp;
+    const d = new Date(parseInt(timestamp, 10));
+    let year = d.getUTCFullYear() < 0 ? d.getUTCFullYear() * -1 : d.getUTCFullYear();
+    year = year.toString().padStart(4, '0');
+    const BCAD = d.getUTCFullYear() < 0 ? 'BC' : 'AD';
+    return `${year}-${d.getUTCMonth() + 1}-${d.getUTCDate()} 00:00:00+00 ${BCAD}`;
+}
 const parseDataValueTime = (value) => {
     if (!granularityByPrecision.hasOwnProperty(value.precision)) {
         console.error(chalk_1.default `{red Unknown date precision "${value.precision}"}`);
@@ -43,10 +52,11 @@ const parseDataValueTime = (value) => {
     if (dateParts.length > 1) {
         dateParts[1] = parseInt(dateParts[1], 10) - 1;
     }
+    const timestamp = utils_1.setUTCDate(...dateParts);
     return {
-        dateString,
+        dateString: toISOString(timestamp),
         granularity,
-        timestamp: utils_1.setUTCDate(...dateParts)
+        timestamp
     };
 };
 const parseDataValueEntity = (value) => {

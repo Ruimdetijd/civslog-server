@@ -24,7 +24,6 @@ exports.execFetch = (url, options = {}) => tslib_1.__awaiter(this, void 0, void 
     catch (err) {
         throwError(err);
     }
-    console.log(body);
     return body;
 });
 function setUserAgent(options) {

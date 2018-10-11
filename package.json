@@ -1,6 +1,6 @@
 {
   "name": "civslog-server",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Civ's Log server",
   "main": "build/index.js",
   "types": "build/index.d.ts",

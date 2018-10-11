@@ -1,5 +1,11 @@
 import { QueryResult } from 'pg';
+import { HttpCode } from '../constants';
+import { RawEv3nt } from 'timeline';
 export declare function hasRows(result: QueryResult): number;
 export declare const byMissing: (where: any) => (req: any, res: any) => Promise<void>;
 export declare const selectOne: (table: any, field: any, value: any) => Promise<any>;
+export declare function selectEventByWid(id: string): Promise<RawEv3nt>;
+export declare function selectEvent(id: string, wid?: boolean): Promise<RawEv3nt>;
+export declare function selectChildren(id: string): Promise<RawEv3nt[]>;
+export declare function selectByClass(klass: string): Promise<[RawEv3nt[], HttpCode]>;
 export declare const execSql: (sql: string, values?: (string | number)[]) => Promise<QueryResult>;

@@ -23,7 +23,6 @@ function toEndDate(wdDate: WdDate): WdDate {
 		wdDate.timestamp = nextDate
 	}
 
-	console.log(wdDate)
 	return wdDate
 }
 

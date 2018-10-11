@@ -13,7 +13,7 @@ exports.default = (event) => tslib_1.__awaiter(this, void 0, void 0, function* (
         return;
     yield utils_2.execSql('DELETE FROM event__location WHERE event_id = $1', [event.id]);
     let endLocations = [];
-    let coordinates = yield fetch_claim_value_1.default(event.wikidata_identifier, 'coordinate location');
+    let coordinates = yield fetch_claim_value_1.default(event.wid, 'coordinate location');
     let locations = coordinates
         .map(coor => {
         const location = new models_1.WdLocation();
@@ -22,9 +22,9 @@ exports.default = (event) => tslib_1.__awaiter(this, void 0, void 0, function* (
     });
     if (!locations.length) {
         const locationProps = ['place of birth', 'location'];
-        const locationPromises = locationProps.map(sp => fetch_locations_1.default(event.wikidata_identifier, sp));
+        const locationPromises = locationProps.map(sp => fetch_locations_1.default(event.wid, sp));
         locations = yield utils_1.promiseAll(locationPromises);
-        endLocations = yield fetch_locations_1.default(event.wikidata_identifier, 'place of death');
+        endLocations = yield fetch_locations_1.default(event.wid, 'place of death');
         locations = locations.concat(coordinates);
     }
     locations = yield Promise.all(locations.map((dl) => tslib_1.__awaiter(this, void 0, void 0, function* () { return yield insert_location_1.default(event, dl); })));

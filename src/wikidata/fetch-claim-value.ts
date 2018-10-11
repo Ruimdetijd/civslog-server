@@ -24,6 +24,15 @@ const granularityByPrecision: { [key: number]: string } = {
 	10: 'MONTH',
 	11: 'DAY',
 }
+function toISOString(timestamp) {
+	if (timestamp == null) return timestamp
+	const d = new Date(parseInt(timestamp, 10))
+	let year = d.getUTCFullYear() < 0 ? d.getUTCFullYear() * -1 : d.getUTCFullYear()
+	// @ts-ignore
+	year = year.toString().padStart(4, '0')
+	const BCAD = d.getUTCFullYear() < 0 ? 'BC' : 'AD'
+	return `${year}-${d.getUTCMonth() + 1}-${d.getUTCDate()} 00:00:00+00 ${BCAD}`
+}
 
 const parseDataValueTime = (value): WdDate => {
 	if (!granularityByPrecision.hasOwnProperty(value.precision)) {
@@ -41,15 +50,18 @@ const parseDataValueTime = (value): WdDate => {
 	else if (granularity === 'MONTH') dateParts = dateParts.slice(0, 2)
 	else if (granularity === 'DAY') dateParts = dateParts.slice(0, 3)
 
+	// Months are zero-based indexed
 	if (dateParts.length > 1) {
 		dateParts[1] = parseInt(dateParts[1], 10) - 1
 	}
 
+	// @ts-ignore
+	const timestamp = setUTCDate(...dateParts)
+
 	return {
-		dateString,
+		dateString: toISOString(timestamp),
 		granularity,
-		// @ts-ignore
-		timestamp: setUTCDate(...dateParts)
+		timestamp
 	}
 }
 
